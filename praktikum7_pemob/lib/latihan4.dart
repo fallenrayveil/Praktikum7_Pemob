@@ -86,11 +86,11 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  // widget untuk menampilkan pilihan negara
+  // widget combobox untuk menampilkan pilihan negara
   Widget _buildPilihanNegara() { 
     return Consumer<NegaraAsean>( 
       builder: (context, NegaraAsean, child) { 
-        return DropdownButton<Negara>(
+        return DropdownButton<Negara>( // dropdownButton
           value: NegaraAsean.negaraTerpilih, 
           onChanged: (Negara? nilaiBaru) { 
             if (nilaiBaru != null) { // jika nilaiBaru tidak null
