@@ -23,8 +23,8 @@ class DaftarUniversitas {
   DaftarUniversitas.fromJson(List<dynamic> json) { 
     universitas = json.map((uni) { // mapping json
       return Universitas( // return Universitas
-        nama: uni['name'], // nama
-        website: uni['web_pages'][0], // website
+        nama: uni['name'], // mengambil nama universitas
+        website: uni['web_pages'][0], // mengambil situs web pertama dari daftar
       );
     }).toList(); // toList
   }
