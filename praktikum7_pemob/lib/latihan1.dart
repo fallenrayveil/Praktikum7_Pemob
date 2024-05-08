@@ -2,39 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart'; // import flutter_bloc
 
 void main() {
   runApp(MyApp());
 }
 
-class Universitas {
-  String nama;
-  String website;
+class Universitas { // class Universitas
+  String nama; // atribut nama bertipe String
+  String website; // atribut website bertipe String
 
-  Universitas({required this.nama, required this.website});
+  Universitas({required this.nama, required this.website}); // konstruktor Universitas
 }
 
-class DaftarUniversitas {
-  List<Universitas> universitas = [];
+class DaftarUniversitas { // class DaftarUniversitas
+  List<Universitas> universitas = []; // list universitas
 
-  DaftarUniversitas.fromJson(List<dynamic> json) {
-    universitas = json.map((uni) {
-      return Universitas(
-        nama: uni['name'],
-        website: uni['web_pages'][0],
+  DaftarUniversitas.fromJson(List<dynamic> json) { // konstruktor DaftarUniversitas
+    universitas = json.map((uni) { // mapping json
+      return Universitas( // return Universitas
+        nama: uni['name'], // mengambil nama universitas
+        website: uni['web_pages'][0], // mengambil situs web pertama dari daftar
       );
-    }).toList();
+    }).toList(); 
   }
 }
 
-class Negara {
-  final String nama;
-  final String url;
+class Negara { // class Negara 
+  final String nama; // atribut nama bertipe String
+  final String url; // atribut url bertipe String
 
-  Negara({required this.nama, required this.url});
+  Negara({required this.nama, required this.url}); // konstruktor Negara
 }
 
+// class NegaraCubit
 final List<Negara> daftarNegara = [
   Negara(nama: 'Indonesia', url: "http://universities.hipolabs.com/search?country=Indonesia"),
   Negara(nama: 'Singapura', url: "http://universities.hipolabs.com/search?country=Singapore"),
@@ -48,10 +49,10 @@ final List<Negara> daftarNegara = [
   Negara(nama: 'Brunei', url: "http://universities.hipolabs.com/search?country=Brunei"),
 ];
 
-class NegaraCubit extends Cubit<Negara> {
-  NegaraCubit() : super(daftarNegara[0]);
+class NegaraCubit extends Cubit<Negara> { // class NegaraCubit
+  NegaraCubit() : super(daftarNegara[0]); // super daftarNegara
 
-  void pilihNegara(Negara negara) => emit(negara);
+  void pilihNegara(Negara negara) => emit(negara); // emit negara
 }
 
 class MyApp extends StatelessWidget {
@@ -67,9 +68,10 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// class DaftarUniversitasPage
 class DaftarUniversitasPage extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
     return Scaffold(
       appBar: AppBar(
         title: Text('Daftar Universitas'),
@@ -84,19 +86,20 @@ class DaftarUniversitasPage extends StatelessWidget {
   }
 }
 
+// class PilihanNegaraDropdown
 class PilihanNegaraDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NegaraCubit, Negara>(
+    return BlocBuilder<NegaraCubit, Negara>( 
       builder: (context, negara) {
         return DropdownButton<Negara>(
           value: negara,
-          onChanged: (newValue) {
-            context.read<NegaraCubit>().pilihNegara(newValue!);
+          onChanged: (newValue) { 
+            context.read<NegaraCubit>().pilihNegara(newValue!); // pilih negara
           },
-          items: daftarNegara.map<DropdownMenuItem<Negara>>((Negara negara) {
-            return DropdownMenuItem<Negara>(
-              value: negara,
+          items: daftarNegara.map<DropdownMenuItem<Negara>>((Negara negara) { // mapping daftarNegara
+            return DropdownMenuItem<Negara>( // return DropdownMenuItem
+              value: negara, 
               child: Text(negara.nama),
             );
           }).toList(),
@@ -106,28 +109,29 @@ class PilihanNegaraDropdown extends StatelessWidget {
   }
 }
 
+// class DaftarUniversitasList
 class DaftarUniversitasList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final negara = context.watch<NegaraCubit>().state;
-    return FutureBuilder<DaftarUniversitas>(
-      future: fetchData(negara.url),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+    final negara = context.watch<NegaraCubit>().state; // watch negara dari NegaraCubit
+    return FutureBuilder<DaftarUniversitas>( // FutureBuilder DaftarUniversitas
+      future: fetchData(negara.url), // fetchData
+      builder: (context, snapshot) { 
+        if (snapshot.connectionState == ConnectionState.waiting) { // jika connectionState waiting
+          return Center(child: CircularProgressIndicator()); // return CircularProgressIndicator
+        } else if (snapshot.hasError) { // jika snapshot error
+          return Center(child: Text('Error: ${snapshot.error}')); // return Text
         } else {
-          return ListView.builder(
-            itemCount: snapshot.data?.universitas.length ?? 0,
-            itemBuilder: (context, index) {
-              final universitas = snapshot.data!.universitas[index];
-              return InkWell(
-                onTap: () async {
-                  if (await canLaunch(universitas.website)) {
-                    await launch(universitas.website);
+          return ListView.builder( 
+            itemCount: snapshot.data?.universitas.length ?? 0, // berisikan jumlah data universitas
+            itemBuilder: (context, index) { 
+              final universitas = snapshot.data!.universitas[index]; // universitas dari snapshot
+              return InkWell( 
+                onTap: () async { 
+                  if (await canLaunch(universitas.website)) { // jika bisa launch
+                    await launch(universitas.website); // launch
                   } else {
-                    throw 'Tidak bisa membuka ${universitas.website}';
+                    throw 'Tidak bisa membuka ${universitas.website}'; // throw error
                   }
                 },
                 child: Container(
@@ -167,12 +171,12 @@ class DaftarUniversitasList extends StatelessWidget {
   }
 }
 
-Future<DaftarUniversitas> fetchData(String url) async {
-  final response = await http.get(Uri.parse(url));
+Future<DaftarUniversitas> fetchData(String url) async { // fetchData
+  final response = await http.get(Uri.parse(url)); // http get
 
-  if (response.statusCode == 200) {
-    return DaftarUniversitas.fromJson(jsonDecode(response.body));
+  if (response.statusCode == 200) { // jika response status code 200
+    return DaftarUniversitas.fromJson(jsonDecode(response.body)); // return DaftarUniversitas
   } else {
-    throw Exception('Gagal load');
-  }
+    throw Exception('Gagal load'); // throw error
+  } 
 }
