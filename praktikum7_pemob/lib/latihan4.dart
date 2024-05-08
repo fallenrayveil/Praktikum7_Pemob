@@ -1,53 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart'; // url_launcher
+import 'package:provider/provider.dart'; // provider
 
 void main() {
   runApp(MyApp());
 }
 
-class Universitas {
-  String nama;
-  String website;
+class Universitas { // class Universitas
+  String nama; // atribut nama bertipe String
+  String website; // atribut website bertipe String
 
-  Universitas({required this.nama, required this.website});
+  Universitas({required this.nama, required this.website}); // konstruktor Universitas
 }
 
+// class DaftarUniversitas
 class DaftarUniversitas {
-  List<Universitas> universitas = [];
+  List<Universitas> universitas = []; // list universitas
 
-  DaftarUniversitas.fromJson(List<dynamic> json) {
-    universitas = json.map((uni) {
-      return Universitas(
-        nama: uni['name'],
-        website: uni['web_pages'][0],
+  // konstruktor DaftarUniversitas
+  DaftarUniversitas.fromJson(List<dynamic> json) { 
+    universitas = json.map((uni) { // mapping json
+      return Universitas( // return Universitas
+        nama: uni['nama'], // nama
+        website: uni['web_pages'][0], // website
       );
-    }).toList();
+    }).toList(); // toList
   }
 }
 
-class Negara {
-  final String nama;
-  final String url;
+class Negara { // class Negara
+  final String nama; // atribut nama bertipe String
+  final String url; // atribut url bertipe String
 
-  Negara({required this.nama, required this.url});
+  Negara({required this.nama, required this.url}); // konstruktor Negara
 }
 
-class NegaraAsean with ChangeNotifier {
-  Negara _negaraTerpilih = daftarNegara[0];
+// class NegaraAsean
+class NegaraAsean with ChangeNotifier { 
+  Negara _negaraTerpilih = daftarNegara[0]; // negaraTerpilih
   
-  Negara get negaraTerpilih => _negaraTerpilih;
+  Negara get negaraTerpilih => _negaraTerpilih; // getter negaraTerpilih
 
+  // setter negaraTerpilih
   void setNegaraTerpilih(Negara negara) {
     _negaraTerpilih = negara;
-    notifyListeners();
+    notifyListeners(); 
   }
 }
 
+// daftar negara
 final List<Negara> daftarNegara = [
-  Negara(nama: 'Indonesia', url: "http://universities.hipolabs.com/search?country=Indonesia"),
+  Negara(nama: 'Indonesia', url: "http://universities.hipolabs.com/search?country=Indonesia"), 
   Negara(nama: 'Singapura', url: "http://universities.hipolabs.com/search?country=Singapore"),
   Negara(nama: 'Malaysia', url: "http://universities.hipolabs.com/search?country=Malaysia"),
   Negara(nama: 'Myanmar', url: "http://universities.hipolabs.com/search?country=Myanmar"),
@@ -72,8 +77,8 @@ class MyApp extends StatelessWidget {
           ),
           body: Column(
             children: [
-              _buildPilihanNegara(),
-              Expanded(child: _buildDaftarUniversitas()),
+              _buildPilihanNegara(), 
+              Expanded(child: _buildDaftarUniversitas()), 
             ],
           ),
         ),
@@ -81,19 +86,19 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  // Widget untuk menampilkan pilihan negara
+  // widget untuk menampilkan pilihan negara
   Widget _buildPilihanNegara() { 
-    return Consumer<NegaraAsean>(
-      builder: (context, NegaraAsean, child) {
+    return Consumer<NegaraAsean>( 
+      builder: (context, NegaraAsean, child) { 
         return DropdownButton<Negara>(
-          value: NegaraAsean.negaraTerpilih,
-          onChanged: (Negara? nilaiBaru) {
-            if (nilaiBaru != null) {
-              NegaraAsean.setNegaraTerpilih(nilaiBaru);
+          value: NegaraAsean.negaraTerpilih, 
+          onChanged: (Negara? nilaiBaru) { 
+            if (nilaiBaru != null) { // jika nilaiBaru tidak null
+              NegaraAsean.setNegaraTerpilih(nilaiBaru); // setNegaraTerpilih
             }
           },
-          items: daftarNegara.map<DropdownMenuItem<Negara>>((Negara negara) {
-            return DropdownMenuItem<Negara>(
+          items: daftarNegara.map<DropdownMenuItem<Negara>>((Negara negara) { // mapping daftarNegara
+            return DropdownMenuItem<Negara>( // return DropdownMenuItem
               value: negara,
               child: Text(negara.nama),
             );
@@ -103,28 +108,28 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  // Widget untuk menampilkan daftar universitas
+  // widget untuk menampilkan daftar universitas
   Widget _buildDaftarUniversitas() {
     return Consumer<NegaraAsean>(
       builder: (context, NegaraAsean, child) {
         return FutureBuilder<DaftarUniversitas>(
-          future: fetchData(NegaraAsean.negaraTerpilih.url),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else {
-              return ListView.builder(
-                itemCount: snapshot.data?.universitas.length ?? 0,
-                itemBuilder: (context, index) {
-                  final universitas = snapshot.data!.universitas[index];
+          future: fetchData(NegaraAsean.negaraTerpilih.url), // fetchData
+          builder: (context, snapshot) { // builder
+            if (snapshot.connectionState == ConnectionState.waiting) { // jika connectionState waiting
+              return Center(child: CircularProgressIndicator()); // return CircularProgressIndicator
+            } else if (snapshot.hasError) { // jika snapshot error
+              return Center(child: Text('Error: ${snapshot.error}')); // return Text
+            } else { 
+              return ListView.builder( 
+                itemCount: snapshot.data?.universitas.length ?? 0, 
+                itemBuilder: (context, index) { 
+                  final universitas = snapshot.data!.universitas[index]; 
                   return InkWell(
                     onTap: () async {
-                      if (await canLaunch(universitas.website)) {
-                        await launch(universitas.website);
+                      if (await canLaunch(universitas.website)) { // jika bisa launch
+                        await launch(universitas.website); // launch
                       } else {
-                        throw 'Tidak bisa membuka ${universitas.website}';
+                        throw 'Tidak bisa membuka ${universitas.website}'; // throw error
                       }
                     },
                     child: Container(
@@ -165,14 +170,14 @@ class MyApp extends StatelessWidget {
     );
   }
  
-  // Fungsi untuk mengambil data dari API
-  Future<DaftarUniversitas> fetchData(String url) async {
-    final response = await http.get(Uri.parse(url));
+  // fungsi untuk mengambil data dari API
+  Future<DaftarUniversitas> fetchData(String url) async { // fetchData
+    final response = await http.get(Uri.parse(url)); // http get
 
-    if (response.statusCode == 200) {
-      return DaftarUniversitas.fromJson(jsonDecode(response.body));
+    if (response.statusCode == 200) { // jika response status code 200
+      return DaftarUniversitas.fromJson(jsonDecode(response.body)); // return DaftarUniversitas
     } else {
-      throw Exception('Gagal load');
+      throw Exception('Gagal load'); // throw error
     }
   }
 }
